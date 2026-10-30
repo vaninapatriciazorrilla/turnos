@@ -36,10 +36,14 @@ button{font:inherit;cursor:pointer;border:0}
 .turno{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--linea);gap:8px}
 .turno button{width:auto;margin:0;padding:8px 12px;font-size:.85rem;border-radius:999px;background:var(--err);color:#fff}
 button.sec{width:100%;padding:13px;border-radius:999px;background:#E2DDD7;color:var(--txt);margin-top:12px}
-.oculto{display:none}
+.oculto{display:none!important}
 footer{text-align:center;font-size:.8rem;margin:26px 0 90px}
 .viral{display:inline-block;padding:10px 16px;border-radius:999px;border:1px dashed var(--mut);color:var(--mut);text-decoration:none}
 a{color:var(--acc)}
 #login button,#crear button,#guardarEd{width:100%;padding:15px;border-radius:999px;background:var(--acc);color:var(--acc-txt);font-weight:700;margin-top:20px}
 .card+.card,#panel .card{margin-top:14px}
 #editar .dia{width:52px}
+.logo{display:block;width:84px;height:84px;object-fit:cover;border-radius:50%;margin:0 auto 10px;box-shadow:0 6px 18px rgba(58,58,58,.12);background:#fff}
+.marca{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--mut);opacity:.7;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;margin:8px 6px 0 0;border-radius:999px;background:#FAF9F7;border:1px solid var(--linea);font-size:.85rem}
+.chip button{background:none;color:var(--err);font-weight:700;padding:0 2px}
