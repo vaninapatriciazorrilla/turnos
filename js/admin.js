@@ -60,10 +60,21 @@ async function cargarTurnos() {
     const fila = document.createElement("div");
     fila.className = "turno";
     fila.innerHTML = `<div><strong>${t.hora.slice(0, 5)}</strong> · ${esc(t.cliente_nombre)}<br><span class="sub">${esc(t.servicio)} · <a href="https://wa.me/${waNum(t.cliente_tel)}" target="_blank">${esc(t.cliente_tel)}</a></span></div>`;
+    const acciones = document.createElement("div");
+    acciones.style.cssText = "display:flex;flex-direction:column;gap:6px";
+    const fechaTxt = t.fecha.split("-").reverse().join("/");
+    const txt = encodeURIComponent(`Hola ${t.cliente_nombre}! Te confirmo tu turno en ${negocio.nombre} el ${fechaTxt} a las ${t.hora.slice(0, 5)} (${t.servicio}). ¡Te esperamos!`);
+    const ok = document.createElement("a");
+    ok.href = `https://wa.me/${waNum(t.cliente_tel)}?text=${txt}`;
+    ok.target = "_blank";
+    ok.textContent = "Confirmar";
+    ok.style.cssText = "padding:8px 12px;border-radius:10px;background:#22c55e;color:#052e16;font-weight:700;font-size:.85rem;text-align:center;text-decoration:none";
     const b = document.createElement("button");
     b.textContent = "Cancelar";
     b.onclick = async () => { if (confirm("¿Cancelar este turno?")) { await db.from("turnos").delete().eq("id", t.id); cargarTurnos(); } };
-    fila.appendChild(b);
+    acciones.appendChild(ok);
+    acciones.appendChild(b);
+    fila.appendChild(acciones);
     $("lista").appendChild(fila);
   });
 }
