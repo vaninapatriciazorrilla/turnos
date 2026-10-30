@@ -5,6 +5,30 @@ let negocio = null;
 // Evita que un texto escrito por un cliente se ejecute como código
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+// Colores que puede elegir cada comercio para su página
+const COLORES = [["Salvia", "#8FA58C"], ["Rosa", "#C9A0A0"], ["Terracota", "#C47A5A"], ["Petróleo", "#4F7A86"], ["Dorado", "#B8975A"], ["Grafito", "#6B6B6B"]];
+
+function pintarColores() {
+  const actual = negocio.color || "#8FA58C";
+  document.documentElement.style.setProperty("--acc", actual);
+  $("colores").innerHTML = "";
+  COLORES.forEach(([nombre, hex]) => {
+    const b = document.createElement("button");
+    b.className = "dia" + (hex.toLowerCase() === actual.toLowerCase() ? " sel" : "");
+    b.style.cssText = "width:auto;padding:8px 12px;display:flex;align-items:center;gap:6px";
+    b.innerHTML = `<span style="width:18px;height:18px;border-radius:50%;background:${hex};border:2px solid #fff"></span><small>${nombre}</small>`;
+    b.onclick = async () => {
+      const { error } = await db.from("negocios").update({ color: hex }).eq("id", negocio.id);
+      if (error) { $("msgColor").textContent = "No se pudo guardar. Probá de nuevo."; $("msgColor").className = "msg err"; return; }
+      negocio.color = hex;
+      pintarColores();
+      $("msgColor").textContent = "¡Listo! Tu página ya usa el color " + nombre + ".";
+      $("msgColor").className = "msg ok";
+    };
+    $("colores").appendChild(b);
+  });
+}
+
 function ver(seccion) {
   ["login", "crear", "panel"].forEach((s) => $(s).classList.toggle("oculto", s !== seccion));
 }
@@ -33,6 +57,7 @@ async function iniciar() {
   $("copiar").onclick = () => { navigator.clipboard.writeText(link); $("copiar").textContent = "¡Copiado!"; };
   $("filtro").value = new Date().toLocaleDateString("sv-SE");
   ver("panel");
+  pintarColores();
   cargarTurnos();
 }
 
