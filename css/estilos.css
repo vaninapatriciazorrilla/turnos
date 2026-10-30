@@ -37,7 +37,7 @@ button{font:inherit;cursor:pointer;border:0}
 .turno button{width:auto;margin:0;padding:8px 12px;font-size:.85rem;border-radius:999px;background:var(--err);color:#fff}
 button.sec{width:100%;padding:13px;border-radius:999px;background:#E2DDD7;color:var(--txt);margin-top:12px}
 .oculto{display:none}
-footer{text-align:center;font-size:.8rem;margin-top:26px}
+footer{text-align:center;font-size:.8rem;margin:26px 0 90px}
 .viral{display:inline-block;padding:10px 16px;border-radius:999px;border:1px dashed var(--mut);color:var(--mut);text-decoration:none}
 a{color:var(--acc)}
 #login button,#crear button{width:100%;padding:15px;border-radius:999px;background:var(--acc);color:var(--acc-txt);font-weight:700;margin-top:20px}
