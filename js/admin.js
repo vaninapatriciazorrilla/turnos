@@ -41,7 +41,7 @@ async function guardar() {
   if (!nombre) return;
   const nuevo = {
     nombre, slug: slugify(nombre) + "-" + Math.random().toString(36).slice(2, 6),
-    rubro: $("nRubro").value.trim(), whatsapp: $("nWhats").value.replace(/\D/g, ""),
+    rubro: $("nRubro").value.trim(), whatsapp: waNum($("nWhats").value),
     servicios: $("nServ").value.split(",").map((s) => s.trim()).filter(Boolean),
     hora_inicio: $("nIni").value, hora_fin: $("nFin").value, duracion_min: Number($("nDur").value) || 30,
   };
@@ -59,7 +59,7 @@ async function cargarTurnos() {
   data.forEach((t) => {
     const fila = document.createElement("div");
     fila.className = "turno";
-    fila.innerHTML = `<div><strong>${t.hora.slice(0, 5)}</strong> · ${esc(t.cliente_nombre)}<br><span class="sub">${esc(t.servicio)} · <a href="https://wa.me/549${t.cliente_tel.replace(/\D/g, "")}" target="_blank">${esc(t.cliente_tel)}</a></span></div>`;
+    fila.innerHTML = `<div><strong>${t.hora.slice(0, 5)}</strong> · ${esc(t.cliente_nombre)}<br><span class="sub">${esc(t.servicio)} · <a href="https://wa.me/${waNum(t.cliente_tel)}" target="_blank">${esc(t.cliente_tel)}</a></span></div>`;
     const b = document.createElement("button");
     b.textContent = "Cancelar";
     b.onclick = async () => { if (confirm("¿Cancelar este turno?")) { await db.from("turnos").delete().eq("id", t.id); cargarTurnos(); } };
