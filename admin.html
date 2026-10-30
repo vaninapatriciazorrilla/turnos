@@ -41,6 +41,11 @@
   <section class="oculto" id="panel">
     <div class="card" id="hoy"></div>
     <div class="card">
+      <label for="filtro">Turnos del día</label>
+      <input type="date" id="filtro">
+      <div id="lista"></div>
+    </div>
+    <div class="card">
       <p class="sub" id="miLink"></p>
       <button class="sec" id="copiar">Copiar link para clientes</button>
       <button class="sec" id="compartirWA">Compartir por WhatsApp</button>
@@ -66,14 +71,21 @@
       <p class="msg" id="msgEd"></p>
     </details>
     <div class="card">
+      <label>Logo de tu comercio</label>
+      <img id="logoPrev" class="logo oculto" alt="Logo">
+      <input id="logoArch" type="file" accept="image/*">
+      <p class="msg" id="msgLogo"></p>
+    </div>
+    <div class="card">
+      <label for="bloqFecha">Días cerrados (feriados, vacaciones)</label>
+      <input id="bloqFecha" type="date">
+      <button class="sec" id="bloquear">Cerrar ese día</button>
+      <div id="bloqLista"></div>
+    </div>
+    <div class="card">
       <label>Color de tu página</label>
       <div class="dias" id="colores"></div>
       <p class="msg" id="msgColor"></p>
-    </div>
-    <div class="card">
-      <label for="filtro">Día</label>
-      <input type="date" id="filtro">
-      <div id="lista"></div>
     </div>
     <button class="sec" id="salir">Salir</button>
   </section>
