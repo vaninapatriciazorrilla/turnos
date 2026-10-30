@@ -29,6 +29,18 @@ async function cargarNegocio() {
   document.title = "Turnos · " + data.nombre;
   $("nombre").textContent = data.nombre;
   $("rubro").textContent = data.rubro || "Reservá tu turno online";
+  // Logo del comercio arriba del nombre
+  if (data.logo) {
+    const img = document.createElement("img");
+    img.src = data.logo; img.alt = data.nombre; img.className = "logo";
+    document.querySelector(".cabecera").prepend(img);
+  }
+  // Marca de agua en el plan gratis
+  if (data.plan !== "pro") {
+    const m = document.createElement("p");
+    m.className = "marca"; m.textContent = "Hecho con Turnos";
+    document.querySelector("footer").prepend(m);
+  }
   $("servicio").innerHTML = data.servicios.map((s) => `<option>${esc(s)}</option>`).join("");
   cargarDias();
 }
@@ -59,7 +71,8 @@ async function cargarDias() {
   const fechas = [];
   for (let i = 0; i < DIAS_VER; i++) {
     const d = new Date(); d.setDate(d.getDate() + i);
-    if (negocio.dias.includes(d.getDay())) fechas.push(d);
+    const cerrado = (negocio.bloqueos || []).includes(d.toLocaleDateString("sv-SE"));
+    if (negocio.dias.includes(d.getDay()) && !cerrado) fechas.push(d);
   }
   const libres = await Promise.all(fechas.map((d) => horasLibres(d.toLocaleDateString("sv-SE"))));
   $("dias").innerHTML = "";
