@@ -71,10 +71,16 @@ async function reservar() {
     mostrar(error.code === "23505" ? "Ese horario se acaba de ocupar. Elegí otro." : "No se pudo reservar. Probá de nuevo.", "err");
     cargarHoras(); return;
   }
-  mostrar(`¡Listo! Tu turno es el ${turno.fecha.split("-").reverse().join("/")} a las ${turno.hora}.`, "ok");
+  const fechaTxt = turno.fecha.split("-").reverse().join("/");
+  mostrar(`¡Listo! Tu turno en ${negocio.nombre} quedó reservado para el ${fechaTxt} a las ${turno.hora}.`, "ok");
   if (negocio.whatsapp) {
-    const txt = encodeURIComponent(`Hola! Reservé un turno el ${turno.fecha} a las ${turno.hora} (${turno.servicio}). Soy ${turno.cliente_nombre}.`);
-    $("msg").innerHTML += ` <a href="https://wa.me/${waNum(negocio.whatsapp)}?text=${txt}" target="_blank">Avisar por WhatsApp</a>`;
+    const txt = encodeURIComponent(`Hola ${negocio.nombre}! Soy ${turno.cliente_nombre}. Reservé un turno para el ${fechaTxt} a las ${turno.hora} (${turno.servicio}).`);
+    const a = document.createElement("a");
+    a.href = `https://wa.me/${waNum(negocio.whatsapp)}?text=${txt}`;
+    a.target = "_blank";
+    a.textContent = `Confirmarle a ${negocio.nombre} por WhatsApp (opcional)`;
+    a.style.display = "block"; a.style.marginTop = "8px";
+    $("msg").appendChild(a);
   }
   cargarHoras();
 }
