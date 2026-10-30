@@ -54,6 +54,13 @@ async function cargarHoras() {
     };
     $("horas").appendChild(b);
   });
+  if (!document.querySelector(".hora:not(:disabled)")) {
+    const aviso = document.createElement("p");
+    aviso.className = "msg err";
+    aviso.style.gridColumn = "1 / -1";
+    aviso.textContent = "No hay más turnos disponibles este día. Probá con otro día.";
+    $("horas").appendChild(aviso);
+  }
 }
 
 function validar() {
