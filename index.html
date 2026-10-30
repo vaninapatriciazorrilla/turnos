@@ -5,38 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reservá tu turno</title>
 <meta name="description" content="Reservá tu turno online en segundos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
 <main class="wrap">
-  <h1 id="nombre">Cargando…</h1>
-  <p class="sub" id="rubro">Reservá tu turno online</p>
+  <header class="cabecera">
+    <p class="rubro" id="rubro">Reservá tu turno online</p>
+    <h1 id="nombre">Cargando…</h1>
+    <p class="titulo">Turnos disponibles</p>
+  </header>
 
   <section class="card" id="form">
     <label for="servicio">Servicio</label>
     <select id="servicio"></select>
 
-    <label for="fecha">Día</label>
-    <input type="date" id="fecha">
+    <label>Elegí el día</label>
+    <div class="dias" id="dias"></div>
 
-    <label>Horario</label>
-    <div class="horas" id="horas"><p class="sub">Elegí un día</p></div>
+    <div id="horas"><p class="sub">Elegí un día para ver los horarios</p></div>
 
     <label for="cliente">Tu nombre</label>
     <input id="cliente" placeholder="Ej: Ana Pérez">
 
     <label for="tel">Tu WhatsApp</label>
-    <input id="tel" type="tel" placeholder="Ej: 221 555 1234">
+    <input id="tel" type="tel" placeholder="Ej: 11 5555 1234">
 
-    <button id="reservar" disabled>Reservar turno</button>
+    <button id="reservar" class="principal" disabled>Reservar turno</button>
     <p class="msg" id="msg"></p>
   </section>
 
-  <footer>Turnos online · <a href="admin.html">Soy el comercio</a></footer>
+  <footer>
+    <a class="viral" href="admin.html">¿Tenés un comercio? Creá tu agenda gratis</a>
+  </footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/reservas.js"></script>
 </body>
 </html>
-
