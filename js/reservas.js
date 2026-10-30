@@ -80,6 +80,19 @@ async function reservar() {
   }
   const fechaTxt = turno.fecha.split("-").reverse().join("/");
   mostrar(`¡Listo! Tu turno en ${negocio.nombre} quedó reservado para el ${fechaTxt} a las ${turno.hora}.`, "ok");
+  // Link para que el cliente agende el turno en su Google Calendar (con su recordatorio)
+  const ini = new Date(turno.fecha + "T" + turno.hora + ":00Z");
+  const fin = new Date(ini.getTime() + negocio.duracion_min * 60000);
+  const gcal = (d) => d.toISOString().slice(0, 19).replace(/[-:]/g, "");
+  const cal = document.createElement("a");
+  cal.href = "https://calendar.google.com/calendar/render?action=TEMPLATE"
+    + "&text=" + encodeURIComponent(`Turno en ${negocio.nombre} (${turno.servicio})`)
+    + "&dates=" + gcal(ini) + "/" + gcal(fin)
+    + "&ctz=America/Argentina/Buenos_Aires";
+  cal.target = "_blank";
+  cal.textContent = "Agregar a mi calendario";
+  cal.style.display = "block"; cal.style.marginTop = "8px";
+  $("msg").appendChild(cal);
   if (negocio.whatsapp) {
     const txt = encodeURIComponent(`Hola ${negocio.nombre}! Soy ${turno.cliente_nombre}. Reservé un turno para el ${fechaTxt} a las ${turno.hora} (${turno.servicio}).`);
     const a = document.createElement("a");
