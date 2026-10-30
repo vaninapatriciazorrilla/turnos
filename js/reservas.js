@@ -74,7 +74,7 @@ async function reservar() {
   mostrar(`¡Listo! Tu turno es el ${turno.fecha.split("-").reverse().join("/")} a las ${turno.hora}.`, "ok");
   if (negocio.whatsapp) {
     const txt = encodeURIComponent(`Hola! Reservé un turno el ${turno.fecha} a las ${turno.hora} (${turno.servicio}). Soy ${turno.cliente_nombre}.`);
-    $("msg").innerHTML += ` <a href="https://wa.me/${negocio.whatsapp}?text=${txt}" target="_blank">Avisar por WhatsApp</a>`;
+    $("msg").innerHTML += ` <a href="https://wa.me/${waNum(negocio.whatsapp)}?text=${txt}" target="_blank">Avisar por WhatsApp</a>`;
   }
   cargarHoras();
 }
