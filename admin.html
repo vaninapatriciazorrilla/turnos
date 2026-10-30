@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel del comercio</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
@@ -38,10 +39,32 @@
 
   <!-- 3. Turnos -->
   <section class="oculto" id="panel">
+    <div class="card" id="hoy"></div>
     <div class="card">
       <p class="sub" id="miLink"></p>
       <button class="sec" id="copiar">Copiar link para clientes</button>
+      <button class="sec" id="compartirWA">Compartir por WhatsApp</button>
+      <button class="sec" id="compartir">Compartir en Instagram u otra app</button>
     </div>
+    <div class="card">
+      <label>QR para tu local</label>
+      <p class="sub">Imprimilo y pegalo en la vidriera o el mostrador.</p>
+      <canvas id="qr" style="width:100%;border-radius:12px;margin:10px 0"></canvas>
+      <button class="sec" id="bajarQR">Descargar QR</button>
+    </div>
+    <details class="card" id="editar">
+      <summary style="font-weight:600;cursor:pointer">Editar mi negocio</summary>
+      <label for="eNombre">Nombre del comercio</label><input id="eNombre">
+      <label for="eRubro">Rubro</label><input id="eRubro">
+      <label for="eWhats">WhatsApp (código de área + número, sin 0 ni 15)</label><input id="eWhats" inputmode="tel">
+      <label for="eServ">Servicios (separados por coma)</label><input id="eServ">
+      <label>Días que atendés</label><div class="dias" id="eDias"></div>
+      <label for="eIni">Abre</label><input id="eIni" type="time">
+      <label for="eFin">Cierra</label><input id="eFin" type="time">
+      <label for="eDur">Duración de cada turno (min)</label><input id="eDur" type="number">
+      <button id="guardarEd">Guardar cambios</button>
+      <p class="msg" id="msgEd"></p>
+    </details>
     <div class="card">
       <label>Color de tu página</label>
       <div class="dias" id="colores"></div>
@@ -56,6 +79,7 @@
   </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/admin.js"></script>
 </body>
