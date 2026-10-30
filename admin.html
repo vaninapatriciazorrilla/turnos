@@ -1,1 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel del comercio</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<main class="wrap">
+  <h1>Panel del comercio</h1>
+  <p class="sub">Tus turnos, en un solo lugar.</p>
+
+  <!-- 1. Entrar -->
+  <section class="card" id="login">
+    <label for="email">Tu email</label>
+    <input id="email" type="email" placeholder="tu@email.com">
+    <button id="entrar">Enviarme link para entrar</button>
+    <p class="msg" id="msgLogin"></p>
+  </section>
+
+  <!-- 2. Crear negocio (primera vez) -->
+  <section class="card oculto" id="crear">
+    <label for="nNombre">Nombre del comercio</label>
+    <input id="nNombre" placeholder="Ej: Peluquería Sol">
+    <label for="nRubro">Rubro</label>
+    <input id="nRubro" placeholder="Ej: Peluquería">
+    <label for="nWhats">WhatsApp (con 549, sin espacios)</label>
+    <input id="nWhats" placeholder="5492215551234">
+    <label for="nServ">Servicios (separados por coma)</label>
+    <input id="nServ" placeholder="Corte, Color, Brushing">
+    <label for="nIni">Abre</label><input id="nIni" type="time" value="09:00">
+    <label for="nFin">Cierra</label><input id="nFin" type="time" value="18:00">
+    <label for="nDur">Duración de cada turno (min)</label><input id="nDur" type="number" value="30">
+    <button id="guardar">Crear mi página de turnos</button>
+    <p class="msg" id="msgCrear"></p>
+  </section>
+
+  <!-- 3. Turnos -->
+  <section class="oculto" id="panel">
+    <div class="card">
+      <p class="sub" id="miLink"></p>
+      <button class="sec" id="copiar">Copiar link para clientes</button>
+    </div>
+    <div class="card">
+      <label for="filtro">Día</label>
+      <input type="date" id="filtro">
+      <div id="lista"></div>
+    </div>
+    <button class="sec" id="salir">Salir</button>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
 
