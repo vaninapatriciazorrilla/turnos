@@ -22,11 +22,79 @@ function pintarColores() {
       if (error) { $("msgColor").textContent = "No se pudo guardar. Probá de nuevo."; $("msgColor").className = "msg err"; return; }
       negocio.color = hex;
       pintarColores();
+      hacerQR(location.origin + "/?n=" + negocio.slug);
       $("msgColor").textContent = "¡Listo! Tu página ya usa el color " + nombre + ".";
       $("msgColor").className = "msg ok";
     };
     $("colores").appendChild(b);
   });
+}
+
+// Cartel con QR para imprimir: nombre del comercio + QR del link de reservas
+function hacerQR(link) {
+  const c = $("qr"), x = c.getContext("2d"), W = 1080, H = 1350;
+  c.width = W; c.height = H;
+  const acc = negocio.color || "#8FA58C";
+  x.fillStyle = "#EDEAE6"; x.fillRect(0, 0, W, H);
+  x.fillStyle = "#FFFFFF"; x.beginPath(); x.roundRect(70, 70, W - 140, H - 140, 50); x.fill();
+  x.textAlign = "center"; x.fillStyle = "#3A3A3A";
+  x.font = "600 70px Montserrat, Arial, sans-serif"; x.fillText(negocio.nombre, W / 2, 230, W - 220);
+  x.fillStyle = acc; x.font = "italic 54px Georgia, serif"; x.fillText("Reservá tu turno", W / 2, 320);
+  const q = qrcode(0, "M"); q.addData(link); q.make();
+  const n = q.getModuleCount(), lado = 640, t = lado / n, ox = (W - lado) / 2, oy = 400;
+  x.fillStyle = "#3A3A3A";
+  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (q.isDark(r, k)) x.fillRect(ox + k * t, oy + r * t, Math.ceil(t), Math.ceil(t));
+  x.fillStyle = "#8A8580"; x.font = "500 40px Montserrat, Arial, sans-serif";
+  x.fillText("Escaneá con la cámara del celular", W / 2, 1150);
+  x.fillStyle = acc; x.fillRect(W / 2 - 60, 1190, 120, 6);
+  $("bajarQR").onclick = () => {
+    const a = document.createElement("a");
+    a.download = "qr-" + negocio.slug + ".png"; a.href = c.toDataURL("image/png"); a.click();
+  };
+}
+
+// Editar datos del negocio desde el panel
+const NOM_DIAS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+let diasEd = [];
+
+function pintarDias() {
+  $("eDias").innerHTML = "";
+  [1, 2, 3, 4, 5, 6, 0].forEach((d) => {
+    const b = document.createElement("button");
+    b.className = "dia" + (diasEd.includes(d) ? " sel" : "");
+    b.innerHTML = `<small>${NOM_DIAS[d]}</small>`;
+    b.onclick = () => { diasEd = diasEd.includes(d) ? diasEd.filter((x) => x !== d) : [...diasEd, d]; pintarDias(); };
+    $("eDias").appendChild(b);
+  });
+}
+
+function llenarEdicion() {
+  $("eNombre").value = negocio.nombre; $("eRubro").value = negocio.rubro || "";
+  $("eWhats").value = negocio.whatsapp || ""; $("eServ").value = negocio.servicios.join(", ");
+  $("eIni").value = negocio.hora_inicio.slice(0, 5); $("eFin").value = negocio.hora_fin.slice(0, 5);
+  $("eDur").value = negocio.duracion_min; diasEd = [...negocio.dias];
+  pintarDias();
+}
+
+async function guardarEdicion() {
+  const m = $("msgEd");
+  const cambios = {
+    nombre: $("eNombre").value.trim(), rubro: $("eRubro").value.trim(), whatsapp: waNum($("eWhats").value),
+    servicios: $("eServ").value.split(",").map((s) => s.trim()).filter(Boolean),
+    hora_inicio: $("eIni").value, hora_fin: $("eFin").value, duracion_min: Number($("eDur").value) || 30,
+    dias: diasEd.sort(),
+  };
+  if (!cambios.nombre) { m.textContent = "Poné el nombre del comercio."; m.className = "msg err"; return; }
+  if (!cambios.dias.length) { m.textContent = "Elegí al menos un día."; m.className = "msg err"; return; }
+  if (cambios.hora_fin <= cambios.hora_inicio) { m.textContent = "La hora de cierre tiene que ser después de la de apertura."; m.className = "msg err"; return; }
+  if (!cambios.servicios.length) cambios.servicios = ["Turno general"];
+  const { error } = await db.from("negocios").update(cambios).eq("id", negocio.id);
+  if (error) { m.textContent = "No se pudo guardar. Probá de nuevo."; m.className = "msg err"; return; }
+  Object.assign(negocio, cambios);
+  const link = location.origin + "/?n=" + negocio.slug;
+  $("miLink").textContent = negocio.nombre + " · " + link;
+  hacerQR(link);
+  m.textContent = "¡Listo! Tus clientes ya ven los cambios."; m.className = "msg ok";
 }
 
 function ver(seccion) {
@@ -55,9 +123,18 @@ async function iniciar() {
   const link = location.origin + "/?n=" + negocio.slug;
   $("miLink").textContent = negocio.nombre + " · " + link;
   $("copiar").onclick = () => { navigator.clipboard.writeText(link); $("copiar").textContent = "¡Copiado!"; };
+  const invitacion = `¡Ya podés reservar tu turno en ${negocio.nombre} online! 👉 ${link}`;
+  $("compartirWA").onclick = () => window.open("https://wa.me/?text=" + encodeURIComponent(invitacion), "_blank");
+  $("compartir").onclick = async () => {
+    if (navigator.share) { try { await navigator.share({ title: negocio.nombre, text: invitacion, url: link }); } catch (e) {} }
+    else { navigator.clipboard.writeText(link); $("compartir").textContent = "Link copiado: pegalo en tu bio"; }
+  };
+  resumenHoy();
   $("filtro").value = new Date().toLocaleDateString("sv-SE");
   ver("panel");
   pintarColores();
+  hacerQR(link);
+  llenarEdicion();
   cargarTurnos();
 }
 
@@ -74,6 +151,19 @@ async function guardar() {
   const { error } = await db.from("negocios").insert(nuevo);
   if (error) { $("msgCrear").textContent = "No se pudo crear. Probá de nuevo."; $("msgCrear").className = "msg err"; return; }
   iniciar();
+}
+
+// Resumen arriba: cuántos turnos hay hoy y cuál es el próximo
+async function resumenHoy() {
+  const hoy = new Date().toLocaleDateString("sv-SE");
+  const ahora = new Date().toTimeString().slice(0, 5);
+  const { data } = await db.from("turnos").select("hora,cliente_nombre,servicio")
+    .eq("negocio_id", negocio.id).eq("fecha", hoy).order("hora");
+  const lista = data || [];
+  const prox = lista.find((t) => t.hora.slice(0, 5) >= ahora);
+  let html = `<p class="titulo" style="font-size:2rem">Hoy</p><p><strong>${lista.length ? "Tenés " + lista.length + (lista.length === 1 ? " turno" : " turnos") : "No tenés turnos hoy"}</strong></p>`;
+  if (prox) html += `<p class="sub">Próximo: ${prox.hora.slice(0, 5)} · ${esc(prox.cliente_nombre)} (${esc(prox.servicio)})</p>`;
+  $("hoy").innerHTML = html;
 }
 
 async function cargarTurnos() {
@@ -96,7 +186,7 @@ async function cargarTurnos() {
     ok.style.cssText = "padding:8px 12px;border-radius:10px;background:#22c55e;color:#052e16;font-weight:700;font-size:.85rem;text-align:center;text-decoration:none";
     const b = document.createElement("button");
     b.textContent = "Cancelar";
-    b.onclick = async () => { if (confirm("¿Cancelar este turno?")) { await db.from("turnos").delete().eq("id", t.id); cargarTurnos(); } };
+    b.onclick = async () => { if (confirm("¿Cancelar este turno?")) { await db.from("turnos").delete().eq("id", t.id); cargarTurnos(); resumenHoy(); } };
     acciones.appendChild(ok);
     acciones.appendChild(b);
     fila.appendChild(acciones);
@@ -107,6 +197,7 @@ async function cargarTurnos() {
 $("entrar").addEventListener("click", entrar);
 $("guardar").addEventListener("click", guardar);
 $("filtro").addEventListener("change", cargarTurnos);
+$("guardarEd").addEventListener("click", guardarEdicion);
 $("salir").addEventListener("click", async () => { await db.auth.signOut(); ver("login"); });
 db.auth.onAuthStateChange(() => iniciar());
 iniciar();
