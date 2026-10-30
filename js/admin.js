@@ -97,6 +97,55 @@ async function guardarEdicion() {
   m.textContent = "¡Listo! Tus clientes ya ven los cambios."; m.className = "msg ok";
 }
 
+// Logo: se sube a Supabase Storage en la carpeta del dueño
+let usuario = null;
+
+function pintarLogo() {
+  $("logoPrev").classList.toggle("oculto", !negocio.logo);
+  if (negocio.logo) $("logoPrev").src = negocio.logo;
+}
+
+async function subirLogo() {
+  const f = $("logoArch").files[0], m = $("msgLogo");
+  if (!f) return;
+  if (f.size > 2 * 1024 * 1024) { m.textContent = "La imagen pesa mucho (máx. 2 MB)."; m.className = "msg err"; return; }
+  m.textContent = "Subiendo…"; m.className = "msg ok";
+  const ruta = usuario.id + "/logo-" + Date.now() + "." + (f.name.split(".").pop() || "png");
+  const { error } = await db.storage.from("logos").upload(ruta, f, { upsert: true });
+  if (error) { m.textContent = "No se pudo subir. Probá de nuevo."; m.className = "msg err"; return; }
+  const url = db.storage.from("logos").getPublicUrl(ruta).data.publicUrl;
+  const { error: e2 } = await db.from("negocios").update({ logo: url }).eq("id", negocio.id);
+  if (e2) { m.textContent = "No se pudo guardar. Probá de nuevo."; m.className = "msg err"; return; }
+  negocio.logo = url; pintarLogo();
+  m.textContent = "¡Listo! Tu logo ya aparece en tu página."; m.className = "msg ok";
+}
+
+// Días cerrados: el cliente no los ve para reservar
+function pintarBloqueos() {
+  const hoy = new Date().toLocaleDateString("sv-SE");
+  const lista = (negocio.bloqueos || []).filter((f) => f >= hoy).sort();
+  $("bloqLista").innerHTML = lista.length ? "" : '<p class="sub">No tenés días cerrados.</p>';
+  lista.forEach((f) => {
+    const c = document.createElement("span");
+    c.className = "chip";
+    c.innerHTML = `${f.split("-").reverse().join("/")} <button title="Abrir de nuevo">✕</button>`;
+    c.querySelector("button").onclick = () => guardarBloqueos(lista.filter((x) => x !== f));
+    $("bloqLista").appendChild(c);
+  });
+}
+
+async function guardarBloqueos(lista) {
+  const { error } = await db.from("negocios").update({ bloqueos: lista }).eq("id", negocio.id);
+  if (error) { alert("No se pudo guardar. Probá de nuevo."); return; }
+  negocio.bloqueos = lista; pintarBloqueos();
+}
+
+function bloquear() {
+  const f = $("bloqFecha").value;
+  if (!f || (negocio.bloqueos || []).includes(f)) return;
+  guardarBloqueos([...(negocio.bloqueos || []), f]);
+}
+
 function ver(seccion) {
   ["login", "crear", "panel"].forEach((s) => $(s).classList.toggle("oculto", s !== seccion));
 }
@@ -117,6 +166,7 @@ async function entrar() {
 async function iniciar() {
   const { data: { user } } = await db.auth.getUser();
   if (!user) return ver("login");
+  usuario = user;
   const { data } = await db.from("negocios").select("*").eq("owner", user.id).maybeSingle();
   if (!data) return ver("crear");
   negocio = data;
@@ -135,6 +185,8 @@ async function iniciar() {
   pintarColores();
   hacerQR(link);
   llenarEdicion();
+  pintarLogo();
+  pintarBloqueos();
   cargarTurnos();
 }
 
@@ -198,6 +250,8 @@ $("entrar").addEventListener("click", entrar);
 $("guardar").addEventListener("click", guardar);
 $("filtro").addEventListener("change", cargarTurnos);
 $("guardarEd").addEventListener("click", guardarEdicion);
+$("logoArch").addEventListener("change", subirLogo);
+$("bloquear").addEventListener("click", bloquear);
 $("salir").addEventListener("click", async () => { await db.auth.signOut(); ver("login"); });
 db.auth.onAuthStateChange(() => iniciar());
 iniciar();
